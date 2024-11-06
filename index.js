@@ -285,7 +285,9 @@ app.post("/protect", uploadSaasPdf.single("pdfFile"), async (req, res) => {
   }
 });
 
-
+app.get("/", function(req, res){
+  res.send("its working")
+})
 
 // Route to unlock PDF
 app.post("/unlock-pdf", uploadSaasPdf.single("file"), async (req, res) => {
