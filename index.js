@@ -209,7 +209,12 @@ const s3 = new S3Client({
 });
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: 'https://pizeonflytools.vercel.app',
+  methods: 'GET,POST,OPTIONS',
+  allowedHeaders: 'Content-Type,Authorization'
+}));
+
 
 app.post("/protect", uploadSaasPdf.single("pdfFile"), async (req, res) => {
   const { password } = req.body;
