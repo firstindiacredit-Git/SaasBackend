@@ -210,8 +210,8 @@ const s3 = new S3Client({
 
 const app = express();
 app.use(cors({
-  origin: 'https://pizeonflytools.vercel.app',
-  methods: 'GET,POST,OPTIONS',
+  origin: ['https://pizeonflytools.vercel.app',"http://localhost:5173"],
+  methods: 'GET,POST,OPTIONS,PUT,PATCH,DELETE',
   allowedHeaders: 'Content-Type,Authorization'
 }));
 
