@@ -61,10 +61,10 @@ dotenv.config();
 
 // Initialize AWS S3 Client
 const s3 = new S3Client({
-  region: process.env.AWS_REGION,
+  region: process.env.BACKEND_REGION,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY,
-    secretAccessKey: process.env.AWS_SECRET_KEY,
+    accessKeyId: process.env.BACKEND_ACCESS_KEY,
+    secretAccessKey: process.env.BACKEND_SECRET_KEY,
   },
 });
 
@@ -84,7 +84,7 @@ const fileFilter = (req, file, cb) => {
 // Configure Multer storage for Employee
 const saasPdfStorage = multerS3({
   s3: s3,
-  bucket: process.env.AWS_BUCKET_NAME,
+  bucket: process.env.BACKEND_BUCKET_NAME,
   acl: 'private',
   key: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + file.originalname;

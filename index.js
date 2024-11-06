@@ -201,10 +201,10 @@ const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 
 // Initialize S3 client
 const s3 = new S3Client({
-  region: process.env.AWS_REGION,
+  region: process.env.BACKEND_REGION,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY,
-    secretAccessKey: process.env.AWS_SECRET_KEY,
+    accessKeyId: process.env.BACKEND_ACCESS_KEY,
+    secretAccessKey: process.env.BACKEND_SECRET_KEY,
   },
 });
 
@@ -219,7 +219,7 @@ app.post("/protect", uploadSaasPdf.single("pdfFile"), async (req, res) => {
   try {
     // Download file from S3
     const downloadParams = {
-      Bucket: process.env.AWS_BUCKET_NAME,
+      Bucket: process.env.BACKEND_BUCKET_NAME,
       Key: req.file.key,
     };
 
@@ -248,7 +248,7 @@ app.post("/protect", uploadSaasPdf.single("pdfFile"), async (req, res) => {
         try {
           const fileContent = fs.readFileSync(outputPath);
           const uploadParams = {
-            Bucket: process.env.AWS_BUCKET_NAME,
+            Bucket: process.env.BACKEND_BUCKET_NAME,
             Key: `uploads/saaspdf/protected_${req.file.originalname}`,
             Body: fileContent,
             ContentType: 'application/pdf'
@@ -258,7 +258,7 @@ app.post("/protect", uploadSaasPdf.single("pdfFile"), async (req, res) => {
 
           // Generate temporary URL for download
           const getObjectParams = {
-            Bucket: process.env.AWS_BUCKET_NAME,
+            Bucket: process.env.BACKEND_BUCKET_NAME,
             Key: `uploads/saaspdf/protected_${req.file.originalname}`
           };
           const url = await getSignedUrl(s3, new GetObjectCommand(getObjectParams), { expiresIn: 3600 });
@@ -301,7 +301,7 @@ app.post("/unlock-pdf", uploadSaasPdf.single("file"), async (req, res) => {
   try {
     // Step 1: Download the file from S3 to local
     const getObjectParams = {
-      Bucket: process.env.AWS_BUCKET_NAME,
+      Bucket: process.env.BACKEND_BUCKET_NAME,
       Key: s3Key,
     };
     const data = await s3.send(new GetObjectCommand(getObjectParams));
@@ -328,7 +328,7 @@ app.post("/unlock-pdf", uploadSaasPdf.single("file"), async (req, res) => {
 
         // Step 3: Upload the decrypted file back to S3
         const uploadParams = {
-          Bucket: process.env.AWS_BUCKET_NAME,
+          Bucket: process.env.BACKEND_BUCKET_NAME,
           Key: `uploads/saaspdf/unlocked_${req.file.originalname}`,
           Body: fileContent,
           ContentType: "application/pdf",
@@ -338,7 +338,7 @@ app.post("/unlock-pdf", uploadSaasPdf.single("file"), async (req, res) => {
         // Step 4: Get a signed URL for the decrypted file
         const unlockedFileKey = `uploads/saaspdf/unlocked_${req.file.originalname}`;
         const signedUrlParams = {
-          Bucket: process.env.AWS_BUCKET_NAME,
+          Bucket: process.env.BACKEND_BUCKET_NAME,
           Key: unlockedFileKey,
         };
         const url = await getSignedUrl(s3, new GetObjectCommand(signedUrlParams), { expiresIn: 3600 });
