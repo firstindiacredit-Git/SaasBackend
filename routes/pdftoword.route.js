@@ -1,4 +1,5 @@
 const express = require("express");
+const multer = require("multer");
 const {
   uploadFile,
   convertFile,
@@ -8,8 +9,10 @@ const {
 } = require("../controller/pdftoword.controller.js");
 
 const router = express.Router();
+const upload = multer({ dest: "/tmp/" }); // Temp storage location
 
-router.post("/upload", uploadFile);
+// Apply multer middleware in the upload route
+router.post("/upload", upload.single("file"), uploadFile);
 router.post("/convert", convertFile);
 router.get("/status", checkStatus);
 router.get("/download", downloadFile);

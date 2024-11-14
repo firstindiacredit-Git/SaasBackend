@@ -2,6 +2,10 @@ const cloudinary = require("cloudinary").v2;
 const axios = require("axios");
 const fs = require("fs");
 const FormData = require("form-data");
+const multer = require("multer");
+
+// Set up multer to store files temporarily in /tmp/
+const upload = multer({ dest: "/tmp/" });
 
 // Custom error class
 class CustomError extends Error {
@@ -23,11 +27,36 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Upload file function
-const uploadFile = BigPromise(async (req, res, next) => {
-  if (!req.files) return next(new CustomError("Please provide a file", 400));
+// // Upload file function
+// const uploadFile = BigPromise(async (req, res, next) => {
+//   if (!req.files) return next(new CustomError("Please provide a file", 400));
 
-  const form = fs.createReadStream(`${req.files.file.tempFilePath}`);
+//   const form = fs.createReadStream(`${req.files.file.tempFilePath}`);
+//   const data = new FormData();
+//   data.append("file", form);
+
+//   const options = {
+//     method: "POST",
+//     url: "https://api.conversiontools.io/v1/files",
+//     headers: {
+//       Authorization: process.env.API_TOKEN,
+//       "Content-Type": "multipart/form-data",
+//     },
+//     data: data,
+//   };
+
+//   axios.request(options)
+//     .then(response => {
+//       res.status(200).json({ success: true, file_id: response.data.file_id });
+//     })
+//     .catch(() => next(new CustomError("File upload failed", 400)));
+// });
+
+// Upload file function using multer
+const uploadFile = BigPromise(async (req, res, next) => {
+  if (!req.file) return next(new CustomError("Please provide a file", 400));
+
+  const form = fs.createReadStream(req.file.path);
   const data = new FormData();
   data.append("file", form);
 
@@ -36,16 +65,20 @@ const uploadFile = BigPromise(async (req, res, next) => {
     url: "https://api.conversiontools.io/v1/files",
     headers: {
       Authorization: process.env.API_TOKEN,
-      "Content-Type": "multipart/form-data",
+      ...data.getHeaders(), // Use FormData's custom headers
     },
     data: data,
   };
 
-  axios.request(options)
-    .then(response => {
+  axios
+    .request(options)
+    .then((response) => {
       res.status(200).json({ success: true, file_id: response.data.file_id });
     })
-    .catch(() => next(new CustomError("File upload failed", 400)));
+    .catch(() => next(new CustomError("File upload failed", 400)))
+    .finally(() => {
+      fs.unlinkSync(req.file.path); // Clean up the temporary file
+    });
 });
 
 // Convert file function

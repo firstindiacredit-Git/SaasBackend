@@ -38,11 +38,12 @@
 // app.listen(PORT, () => {
 //   console.log(`Server running on http://localhost:${PORT}`);
 // });
+// index.js
+
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const expressFileUpload = require("express-fileupload"); // ADD this line
 const protectRoute = require("./routes/protect.route.js");
 const unlockRoute = require("./routes/unlock.route.js");
 const emailSenderRoute = require("./routes/emailsender.route.js");
@@ -57,12 +58,6 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.urlencoded({ extended: false }));
-
-// Add file upload middleware
-app.use(expressFileUpload({
-  useTempFiles: true,
-  tempFileDir: "/tmp/",
-}));
 
 // Routes
 app.use("/protect", protectRoute);
