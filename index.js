@@ -16,22 +16,25 @@ const verifier = require('email-verify');
 const nodemailer = require('nodemailer');
 const xlsx = require('xlsx');
 const { chromium } = require('playwright');
-
-
 const app = express();
+
+// Middleware
 app.use(cors());
-const upload = multer({ dest: 'uploads/' });
-
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload({
     useTempFiles: true,
     tempFileDir: "/tmp/",
 }));
-
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use((err, req, res, next) => {
+    res.status(err.code || 500).json({ message: err.message || "Internal Server Error" });
+});
+
+// Cloudinary configuration
+const upload = multer({ dest: 'uploads/' });
+
 
 app.post("/protect", upload.single("pdfFile"), (req, res) => {
     const { password } = req.body;
@@ -223,10 +226,7 @@ app.get('/', (req, res) => {
     res.send("Welcome to PDF to Word Converter API!");
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-    res.status(err.code || 500).json({ message: err.message || "Internal Server Error" });
-});
+
 
 // Email checker code
 
