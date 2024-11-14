@@ -23,6 +23,16 @@ app.use(cors());
 const upload = multer({ dest: 'uploads/' });
 
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(fileUpload({
+    useTempFiles: true,
+    tempFileDir: "/tmp/",
+}));
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
 app.post("/protect", upload.single("pdfFile"), (req, res) => {
     const { password } = req.body;
     const inputPath = req.file.path;
@@ -93,12 +103,7 @@ cloudinary.config({
 });
 
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(fileUpload({
-    useTempFiles: true,
-    tempFileDir: "/tmp/",
-}));
+
 
 // Controller functions
 const uploadFile = BigPromise(async (req, res, next) => {
@@ -225,8 +230,7 @@ app.use((err, req, res, next) => {
 
 // Email checker code
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+
 
 // Route to validate multiple emails
 app.post('/validate', (req, res) => {
