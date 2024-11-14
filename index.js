@@ -225,8 +225,8 @@ app.use((err, req, res, next) => {
 
 // Email checker code
 
-app.use(express.json()); // For parsing application/json
-app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 // Route to validate multiple emails
 app.post('/validate', (req, res) => {
