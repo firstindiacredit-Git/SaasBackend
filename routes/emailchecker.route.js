@@ -3,6 +3,6 @@ const { validateEmails } = require("../controller/emailchecker.controller.js");
 
 const router = express.Router();
 
-router.post("/", validateEmails);
+router.post("/email", validateEmails);
 
 module.exports = router;

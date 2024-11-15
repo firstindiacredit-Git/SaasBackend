@@ -64,7 +64,7 @@ app.use("/protect", protectRoute);
 app.use("/unlock-pdf", unlockRoute);
 app.use("/send-email", emailSenderRoute);
 app.use("/api/file", pdfToWordRoute);
-app.use("/validate", emailCheckerRoute);
+app.use("/api", emailCheckerRoute);
 
 // Root route
 app.get("/", (req, res) => {
