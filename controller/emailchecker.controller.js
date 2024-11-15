@@ -24,39 +24,35 @@
 // module.exports = { validateEmails };
 
 
-const verifier = require('email-verify');
+const verifier = require("email-verify");
 
 const validateEmails = async (req, res) => {
-  const emails = req.body.emails;
+  const emails = req.body.emails; // Array of emails
 
   if (!Array.isArray(emails) || emails.length === 0) {
-    return res.status(400).json({ message: 'Invalid input. Please provide an array of emails.' });
+    return res.status(400).json({ message: "Invalid input. Please provide an array of emails." });
   }
 
   try {
-    // Dynamically import p-limit
-    const { default: pLimit } = await import('p-limit');
-    const limit = pLimit(5);
-
+    // Use Promise.all to handle asynchronous email verification
     const results = await Promise.all(
-      emails.map((email) =>
-        limit(() =>
-          new Promise((resolve) => {
-            verifier.verify(email, function (err, info) {
-              resolve({
-                email: email,
-                success: !err && info.success,
-                info: err ? err.message : info,
-              });
+      emails.map((email) => {
+        return new Promise((resolve) => {
+          verifier.verify(email, function (err, info) {
+            resolve({
+              email: email,
+              success: !err && info.success, // Ensure success is false if there's an error
+              info: err ? err.message : info,
             });
-          })
-        )
-      )
+          });
+        });
+      })
     );
 
+    // Return all results after processing
     res.json(results);
   } catch (error) {
-    res.status(500).json({ message: 'Error verifying emails.', error: error.message });
+    res.status(500).json({ message: "Error verifying emails.", error: error.message });
   }
 };
 
